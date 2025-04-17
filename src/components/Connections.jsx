@@ -9,22 +9,39 @@ const Connections = () => {
   const connections = useSelector((store) => store.connections);
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
+
+  // Fetch connections with authentication token
   const fetchConnections = async () => {
     try {
+      // Get the token from localStorage or Redux store (wherever you save it)
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        setError(true); // If no token, set error state
+        return;
+      }
+
+      // Make the request with Authorization header
       const res = await axios.get(BASE_URL + "/user/connections", {
-        withCredentials: true,
+        headers: {
+          "Authorization": `Bearer ${token}`, // Include the token here
+        },
+        withCredentials: true, // Include credentials if needed
       });
+
       const validConnections = res?.data?.data?.filter((con) => con !== null);
       dispatch(addConnections(validConnections));
     } catch (err) {
-      setError(true);
+      setError(true); // If an error occurs (e.g., unauthorized), set error state
     }
   };
 
   useEffect(() => {
     fetchConnections();
   }, []);
+
   if (error) return <Error />;
+
   if (!connections || connections.length === 0)
     return (
       <h1 className="flex justify-center my-10 text-5xl">No connections</h1>

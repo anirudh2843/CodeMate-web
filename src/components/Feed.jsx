@@ -5,38 +5,44 @@ import Error from "./Error";
 import axios from "axios";
 import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
+
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
 
   const getFeed = async () => {
-    if (feed) return;
     try {
       const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
       });
       dispatch(addFeed(res.data));
     } catch (err) {
-      <Error />;
+      // Return the Error component on failure
+      return <Error />;
     }
   };
+
   useEffect(() => {
     getFeed();
-  }, []);
+  }, []); // Empty dependency array ensures this is only called once
 
-  if(!feed){
-    return ;
+  // Handle the loading state
+  if (feed === undefined) {
+    return <div>Loading...</div>; // Or any loading indicator
   }
-  if(feed.length<=0){
-    return <h1 className="flex justify-center my-4 text-3xl font-bold">No New Users Found!</h1>
+
+  if (feed.length <= 0) {
+    return (
+      <h1 className="flex justify-center my-4 text-3xl font-bold">
+        No New Users Found!
+      </h1>
+    );
   }
 
   return (
-    feed && (
-      <div className="flex justify-center my-10 ">
-        <UserCard user={feed[0]} />
-      </div>
-    )
+    <div className="flex justify-center my-10">
+      <UserCard user={feed[0]} />
+    </div>
   );
 };
 
