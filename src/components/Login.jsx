@@ -16,6 +16,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    axios.defaults.withCredentials = true;
     try {
       const res = await axios.post(
         BASE_URL + "/login",
@@ -28,16 +29,15 @@ const Login = () => {
       dispatch(addUser(res.data));
       return navigate("/feed");
     } catch (err) {
-      if (err?.response?.data) {
-        setError(err?.response?.data);
-      } else {
-        setError("Something went wrong!!!");
-      }
+      setError(err?.response?.data || "Something went wrong!!!");
     }
   };
-  
 
   const handleSignUp = async () => {
+    if (!firstName || !lastName || !emailId || !password) {
+      setError("All fields are required!");
+      return;
+    }
     try {
       const res = await axios.post(
         BASE_URL + "/signup",
@@ -47,11 +47,7 @@ const Login = () => {
       dispatch(addUser(res.data.data));
       return navigate("/profile");
     } catch (err) {
-      if (err?.response?.data) {
-        setError(err?.response?.data);
-      } else {
-        setError("Something went wrong!!!");
-      }
+      setError(err?.response?.data || "Something went wrong!!!");
     }
   };
 
@@ -89,7 +85,7 @@ const Login = () => {
               </>
             )}
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Email ID {emailId}</legend>
+              <legend className="fieldset-legend">Email ID</legend>
               <input
                 type="email"
                 value={emailId}
@@ -99,7 +95,7 @@ const Login = () => {
               />
             </fieldset>
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">Password {password}</legend>
+              <legend className="fieldset-legend">Password</legend>
               <input
                 type="password"
                 value={password}
@@ -109,7 +105,7 @@ const Login = () => {
               />
             </fieldset>
           </div>
-          <p className="text-red-500">{error}</p>
+          {error && <p className="text-red-500">{error}</p>}
           <div className="card-actions justify-center">
             <button
               className="btn btn-primary"
