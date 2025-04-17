@@ -15,25 +15,30 @@ const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async () => {
+    if (!emailId || !password) {
+      setError("Both fields are required!");
+      return;
+    }
+
     try {
       const res = await axios.post(
         BASE_URL + "/login",
-        { username, password },
+        { emailId, password }, // or username if your backend expects it that way
         {
-          withCredentials: true, // Make sure credentials are sent (cookies or tokens)
+          withCredentials: true,
         }
       );
 
       if (res.status === 200) {
-        // Handle successful login (e.g., save token or session info)
-        console.log("Login successful!", res.data);
+        dispatch(addUser(res.data.data));
+        return navigate("/profile");
       } else {
-        console.log("Login failed!", res);
+        setError("Login failed, try again.");
       }
     } catch (err) {
       console.error("Error during login:", err);
-      alert("Login failed, please try again.");
+      setError("Login failed, please try again.");
     }
   };
 
