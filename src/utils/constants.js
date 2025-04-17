@@ -1,1 +1,1 @@
-export const BASE_URL = "https://code-mate-eta.vercel.app";
+export const BASE_URL = "https://codemate-2.onrender.com";
