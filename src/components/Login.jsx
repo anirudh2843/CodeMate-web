@@ -15,23 +15,24 @@ const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    axios.defaults.withCredentials = true;
+  const handleLogin = async (username, password) => {
     try {
-      const res = await axios.post(
-        BASE_URL + "/login",
-        {
-          emailId,
-          password,
-        },
-        { withCredentials: true }
-      );
-      dispatch(addUser(res.data));
-      return navigate("/feed");
+      const res = await axios.post(BASE_URL + "/login", { username, password }, {
+        withCredentials: true, // Make sure credentials are sent (cookies or tokens)
+      });
+  
+      if (res.status === 200) {
+        // Handle successful login (e.g., save token or session info)
+        console.log("Login successful!", res.data);
+      } else {
+        console.log("Login failed!", res);
+      }
     } catch (err) {
-      setError(err?.response?.data || "Something went wrong!!!");
+      console.error("Error during login:", err);
+      alert("Login failed, please try again.");
     }
   };
+  
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !emailId || !password) {

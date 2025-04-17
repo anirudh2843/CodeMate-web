@@ -13,31 +13,33 @@ const Feed = () => {
   const getFeed = async () => {
     try {
       const res = await axios.get(BASE_URL + "/feed", {
-        withCredentials: true,
+        withCredentials: true, // Include credentials in the request
       });
-      dispatch(addFeed(res.data || [])); // Ensure data is not null
+
+      // Dispatch feed data to Redux store
+      dispatch(addFeed(res.data));
     } catch (err) {
-      // Handle error properly (returning Error component or logging)
-      console.error(err);
-      return <Error />;
+      if (err.response && err.response.status === 401) {
+        // If 401 error occurs, redirect to login page
+        console.log("Unauthorized, please log in again");
+        window.location.href = "/login";  // Or use react-router to redirect
+      } else {
+        console.error("Error fetching feed", err);
+        return <Error />;
+      }
     }
   };
 
   useEffect(() => {
     getFeed();
-  }, []); // Empty dependency array ensures this runs once
+  }, []);  // Empty dependency array ensures this runs once
 
-  // Ensure feed is an array before checking its length
   if (!Array.isArray(feed)) {
-    return <div>Loading...</div>; // Display loading if feed is not an array
+    return <div>Loading...</div>;
   }
 
   if (feed.length === 0) {
-    return (
-      <h1 className="flex justify-center my-4 text-3xl font-bold">
-        No New Users Found!
-      </h1>
-    );
+    return <h1 className="flex justify-center my-4 text-3xl font-bold">No New Users Found!</h1>;
   }
 
   return (
