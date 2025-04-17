@@ -15,23 +15,24 @@ const Feed = () => {
       const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
       });
-      dispatch(addFeed(res.data));
+      dispatch(addFeed(res.data || [])); // Ensure data is not null
     } catch (err) {
-      // Return the Error component on failure
+      // Handle error properly (returning Error component or logging)
+      console.error(err);
       return <Error />;
     }
   };
 
   useEffect(() => {
     getFeed();
-  }, []); // Empty dependency array ensures this is only called once
+  }, []); // Empty dependency array ensures this runs once
 
-  // Handle the loading state
-  if (feed === undefined) {
-    return <div>Loading...</div>; // Or any loading indicator
+  // Ensure feed is an array before checking its length
+  if (!Array.isArray(feed)) {
+    return <div>Loading...</div>; // Display loading if feed is not an array
   }
 
-  if (feed.length <= 0) {
+  if (feed.length === 0) {
     return (
       <h1 className="flex justify-center my-4 text-3xl font-bold">
         No New Users Found!
