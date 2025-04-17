@@ -17,10 +17,14 @@ const Login = () => {
 
   const handleLogin = async (username, password) => {
     try {
-      const res = await axios.post(BASE_URL + "/login", { username, password }, {
-        withCredentials: true, // Make sure credentials are sent (cookies or tokens)
-      });
-  
+      const res = await axios.post(
+        BASE_URL + "/login",
+        { username, password },
+        {
+          withCredentials: true, // Make sure credentials are sent (cookies or tokens)
+        }
+      );
+
       if (res.status === 200) {
         // Handle successful login (e.g., save token or session info)
         console.log("Login successful!", res.data);
@@ -32,7 +36,6 @@ const Login = () => {
       alert("Login failed, please try again.");
     }
   };
-  
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !emailId || !password) {
