@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Welcome = () => {
+  console.log("Environment is:", process.env.NODE_ENV);
+
   const navigate = useNavigate();
   const userData = useSelector((store) => store.user);
   const isLoggedIn = userData && Object.keys(userData).length > 0;
@@ -17,7 +19,9 @@ const Welcome = () => {
     <div className="flex flex-col items-center justify-center min-h-screen text-5xl">
       <h1>
         Welcome to the{" "}
-        <span className="font-bold italic text-yellow-500">Coder's World!!!</span>
+        <span className="font-bold italic text-yellow-500">
+          Coder's World!!!
+        </span>
       </h1>
       <h2 className="text-xl font-bold text-yellow-500 mt-4 italic">
         Connect with{" "}
