@@ -4,6 +4,7 @@ import Error from "./Error";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
+import { Link } from "react-router-dom";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections);
@@ -53,6 +54,9 @@ const Connections = () => {
                 {age && <p>{age + ", " + gender}</p>}
                 <p>{about}</p>
               </div>
+              <div className="flex flex-col justify-center">
+                <Link to={"/chat/"+_id}><button className="btn btn-primary">Chat</button></Link>
+              </div>  
             </div>
           </div>
         );

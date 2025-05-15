@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import NavBar from "./NavBar.jsx";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Footer from "./Footer.jsx";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants.js";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice.js";
 import backgroundImage from "../assests/bg.jpg";
+
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,7 +15,9 @@ const Body = () => {
   const userData = useSelector((store) => store.user);
 
   const fetchUser = async () => {
-    if (userData) return;
+    // Check if user is already loaded
+    if (userData && Object.keys(userData).length > 0) return;
+
     try {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
@@ -24,12 +26,14 @@ const Body = () => {
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/welcome");
+      } else {
+        console.error("Error fetching user:", err);
       }
     }
   };
 
   useEffect(() => {
-    const publicRoutes = ["/welcome", "/login"];
+    const publicRoutes = ["/", "/welcome", "/login"];
     if (!publicRoutes.includes(location.pathname)) {
       fetchUser();
     }

@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const isLoggedIn = false; // Replace this with your actual login state logic
+  const userData = useSelector((store) => store.user);
+  const isLoggedIn = userData && Object.keys(userData).length > 0;
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -18,9 +20,9 @@ const Welcome = () => {
         <span className="font-bold italic text-yellow-500">Coder's World!!!</span>
       </h1>
       <h2 className="text-xl font-bold text-yellow-500 mt-4 italic">
-        Connect with{" "} 
+        Connect with{" "}
         <span className="font-bold text-4xl text-gray-200">
-           like-minded people
+          like-minded people
         </span>
       </h2>
       <button

@@ -32,7 +32,10 @@ const NavBar = () => {
   return (
     <div className="navbar bg-base-200 shadow-sm bg-blue-800">
       <div className="flex-1">
-        <button onClick={handleLinkClick} className="text-2xl mx-2">
+        <button
+          onClick={handleLinkClick}
+          className="text-2xl mx-2 cursor-pointer"
+        >
           CodeMate
         </button>
       </div>
