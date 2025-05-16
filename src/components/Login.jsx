@@ -32,7 +32,7 @@ const Login = () => {
       console.log(res);
       // return navigate("/profile");
 
-      if (res.statusText === "OK") {
+      if (res.status === 200) {
         dispatch(addUser(res.data.data));
         return navigate("/profile");
       } else {
