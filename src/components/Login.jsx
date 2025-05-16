@@ -34,7 +34,7 @@ const Login = () => {
 
       if (res.status === 200) {
         dispatch(addUser(res.data.data));
-        return navigate("/profile");
+        return navigate("/feed");
       } else {
         setError("Login failed, try again.");
       }

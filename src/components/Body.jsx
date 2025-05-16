@@ -25,7 +25,12 @@ const Body = () => {
       dispatch(addUser(res.data));
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        navigate("/welcome");
+        if (
+          location.pathname !== "/welcome" &&
+          location.pathname !== "/login"
+        ) {
+          navigate("/welcome");
+        }
       } else {
         console.error("Error fetching user:", err);
       }
@@ -41,15 +46,20 @@ const Body = () => {
 
   return (
     <div
-      className="relative bg-cover bg-center min-h-screen w-full flex flex-col"
+      className="relative bg-cover bg-center bg-fixed min-h-screen w-full flex flex-col"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10 flex flex-col min-h-screen">
+
+      {/* Content wrapper */}
+      <div className="relative z-10 flex flex-col min-h-screen overflow-y-auto">
         <NavBar />
-        <div className="flex-grow">
+
+        <main className="flex-grow px-4 sm:px-6 md:px-10 lg:px-20 py-6">
           <Outlet />
-        </div>
+        </main>
+
         <Footer />
       </div>
     </div>
