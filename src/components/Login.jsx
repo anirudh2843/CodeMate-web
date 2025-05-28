@@ -33,7 +33,6 @@ const Login = () => {
       // return navigate("/profile");
 
       if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
         dispatch(addUser(res.data.data));
         return navigate("/feed");
       } else {

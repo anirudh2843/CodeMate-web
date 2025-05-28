@@ -21,9 +21,6 @@ const Feed = () => {
     try {
       const res = await axios.get(`${BASE_URL}/feed`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       dispatch(addFeed(res.data));
     } catch (err) {
