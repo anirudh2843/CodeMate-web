@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
-import Error from "./Error";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";

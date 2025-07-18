@@ -1,19 +1,19 @@
-import axios from "axios";
 import React from "react";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
-import Error from "./Error";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // 🔓 Logout handler: clears user session and navigates to login
   const handleLogout = async () => {
     try {
-      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
+      await axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true });
       dispatch(removeUser());
       navigate("/login");
     } catch (err) {
@@ -21,35 +21,32 @@ const NavBar = () => {
     }
   };
 
+  // 🧭 Brand button: Navigates to feed or welcome based on login state
   const handleLinkClick = () => {
-    if (!user) {
-      navigate("/welcome");
-    } else {
-      navigate("/feed");
-    }
+    if (!user) navigate("/welcome");
+    else navigate("/feed");
   };
 
   return (
     <nav className="bg-blue-800 text-white shadow-sm w-full">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between">
-        {/* Brand */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleLinkClick}
-            className="text-2xl font-bold cursor-pointer"
-          >
-            CodeMate
-          </button>
-        </div>
+        {/* 🔹 Brand / Logo */}
+        <button
+          onClick={handleLinkClick}
+          className="text-2xl font-bold cursor-pointer"
+        >
+          CodeMate
+        </button>
 
-        {/* Right Section */}
+        {/* 🔸 Right Section (Only when logged in) */}
         {user && (
           <div className="flex flex-wrap items-center gap-3 mt-2 sm:mt-0">
+            {/* 🧑‍💻 Welcome text */}
             <div className="text-sm sm:text-base">
               Welcome, <span className="font-mono">{user.firstName}</span>
             </div>
 
-            {/* Links */}
+            {/* 🔗 Navigation Links */}
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/connections"
@@ -65,7 +62,7 @@ const NavBar = () => {
               </Link>
             </div>
 
-            {/* Avatar Dropdown */}
+            {/* 👤 Avatar Dropdown Menu */}
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
@@ -76,6 +73,8 @@ const NavBar = () => {
                   <img alt="User" src={user.photoUrl} />
                 </div>
               </div>
+
+              {/* Dropdown Options */}
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content mt-3 z-[1] p-2 space-y-1 shadow-lg bg-gradient-to-b from-gray-800 to-gray-900 text-white rounded-xl w-44"

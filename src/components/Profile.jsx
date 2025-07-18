@@ -1,12 +1,14 @@
 import React from "react";
-import EditProfile from "./EditProfile";
 import { useSelector } from "react-redux";
+import EditProfile from "./EditProfile";
 
 const Profile = () => {
-  const user = useSelector((store) => store.user);
+  const user = useSelector((store) => store.user); // 👤 Get logged-in user from Redux
+
+  // ✅ Only show EditProfile if user exists
   return (
     user && (
-      <div>
+      <div className="p-4">
         <EditProfile user={user} />
       </div>
     )
