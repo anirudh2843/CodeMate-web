@@ -30,12 +30,17 @@ const Login = () => {
         }
       );
 
-      // ✅ Save token and user
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.data));
+      if (res.status === 200 && res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.data));
+        dispatch(addUser(res.data.data));
+        axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+        console.log("Login successful, navigating to /feed");
 
-      dispatch(addUser(res.data.data));
-      navigate("/feed");
+        navigate("/feed");
+      } else {
+        setError("Login failed, try again.");
+      }
     } catch (err) {
       console.error("Error during login:", err);
       setError("Login failed, please try again.");

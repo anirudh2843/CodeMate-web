@@ -9,7 +9,11 @@ import Connections from "./components/Connections";
 import Requests from "./components/Requests";
 import Welcome from "./components/Welcome";
 import Chat from "./components/Chat";
-
+import axios from "axios";
+const token = localStorage.getItem("token");
+if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 function App() {
   return (
     <>
@@ -17,8 +21,8 @@ function App() {
         <BrowserRouter basename="/">
           <Routes>
             <Route path="/" element={<Body />}>
-              <Route path="/" element={<Welcome />} />
-              <Route path="/welcome" element={<Welcome />} />{" "}
+              <Route index element={<Welcome />} /> {/* default route */}
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/login" element={<Login />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/profile" element={<Profile />} />
