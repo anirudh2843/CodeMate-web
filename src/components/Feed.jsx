@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/constants";
 import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 import Error from "./Error";
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
@@ -27,7 +27,7 @@ const Feed = () => {
       });
       dispatch(addFeed(res.data));
     } catch (err) {
-      console.error("Error fetching feed:", err);
+      console.error("Feed error:", err?.response?.data || err.message);
       setError(true);
     } finally {
       setLoading(false);

@@ -24,26 +24,53 @@ const Login = () => {
     try {
       const res = await axios.post(
         BASE_URL + "/login",
-        { emailId, password }, // or username if your backend expects it that way
+        { emailId, password },
         {
           withCredentials: true,
         }
       );
-      console.log(res);
-      // return navigate("/profile");
 
-      if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
-        dispatch(addUser(res.data.data));
-        return navigate("/feed");
-      } else {
-        setError("Login failed, try again.");
-      }
+      // ✅ Save token and user
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.data));
+
+      dispatch(addUser(res.data.data));
+      navigate("/feed");
     } catch (err) {
       console.error("Error during login:", err);
       setError("Login failed, please try again.");
     }
   };
+
+  // const handleLogin = async () => {
+  //   if (!emailId || !password) {
+  //     setError("Both fields are required!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await axios.post(
+  //       BASE_URL + "/login",
+  //       { emailId, password }, // or username if your backend expects it that way
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     console.log(res);
+  //     // return navigate("/profile");
+
+  //     if (res.status === 200) {
+  //       localStorage.setItem("token", res.data.token);
+  //       dispatch(addUser(res.data.data));
+  //       return navigate("/feed");
+  //     } else {
+  //       setError("Login failed, try again.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error during login:", err);
+  //     setError("Login failed, please try again.");
+  //   }
+  // };
 
   const handleSignUp = async () => {
     if (!firstName || !lastName || !emailId || !password) {
