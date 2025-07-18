@@ -5,6 +5,7 @@ import { BASE_URL } from "../utils/constants";
 import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 import Error from "./Error";
+const token = localStorage.getItem("token");
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
@@ -17,10 +18,12 @@ const Feed = () => {
   const getFeed = async () => {
     if (feed && feed.length > 0) return;
     setLoading(true);
-    const token = localStorage.getItem("token");
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.get(`${BASE_URL}/feed`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       dispatch(addFeed(res.data));
     } catch (err) {
