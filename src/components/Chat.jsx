@@ -61,17 +61,39 @@ const Chat = () => {
     };
   }, [userId, targetUserId]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (newMessage.trim() === "") return; // prevent sending empty
-    const socket = createSocketConnection();
-    socket.emit("sendMessage", {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      userId,
-      targetUserId,
-      text: newMessage,
-    });
-    setNewMessage("");
+    try {
+      // ✅ Step 1: Save message to backend
+      const response = await axios.post(
+        `${BASE_URL}/chat/${targetUserId}`,
+        { text: newMessage },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // or however you store JWT
+          },
+        }
+      );
+      const latestMessage = response?.data?.messages?.slice(-1)[0];
+      const sender = latestMessage?.senderId;
+
+      if (latestMessage) {
+        const socket = createSocketConnection();
+        socket.emit("sendMessage", {
+          firstName: sender?.firstName,
+          lastName: sender?.lastName,
+          userId,
+          targetUserId,
+          text: newMessage,
+          createdAt: latestMessage?.createdAt,
+        });
+      }
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      alert("Failed to send message. Try again.");
+    }
   };
 
   return (

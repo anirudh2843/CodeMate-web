@@ -18,6 +18,7 @@ const Connections = () => {
       const validConnections = res?.data?.data?.filter((con) => con !== null);
       dispatch(addConnections(validConnections));
     } catch (err) {
+      console.error("Error fetching connections:", err?.response || err);
       setError(true);
     }
   };
