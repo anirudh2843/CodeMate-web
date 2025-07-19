@@ -50,13 +50,14 @@ const NavBar = () => {
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/connections"
-                className="inline-block rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all duration-200"
+                className="inline-block rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-600 transition-all duration-200"
               >
                 Friends
               </Link>
+
               <Link
                 to="/requests"
-                className="inline-block rounded-full bg-gradient-to-r from-yellow-500 to-green-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:from-pink-600 hover:to-green-600 transition-all duration-200"
+                className="inline-block rounded-full bg-purple-500 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-purple-600 transition-all duration-200"
               >
                 Requests
               </Link>
