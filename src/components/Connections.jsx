@@ -9,17 +9,27 @@ const Connections = () => {
   const connections = useSelector((store) => store.connections);
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchConnections = async () => {
     try {
-      const res = await axios.get(BASE_URL + "/user/connections", {
+      const res = await axios.get(`${BASE_URL}/user/connections`, {
         withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
+
       const validConnections = res?.data?.data?.filter((con) => con !== null);
       dispatch(addConnections(validConnections));
     } catch (err) {
-      console.error("Error fetching connections:", err?.response || err);
+      console.error(
+        "Error fetching connections:",
+        err?.response?.data || err.message
+      );
       setError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,7 +37,20 @@ const Connections = () => {
     fetchConnections();
   }, []);
 
-  if (error) return <Error />;
+  if (loading)
+    return (
+      <h1 className="text-center my-10 text-gray-500">
+        Loading connections...
+      </h1>
+    );
+
+  if (error)
+    return (
+      <h1 className="text-center my-10 text-red-500 text-xl font-bold">
+        Failed to load connections. Please try again.
+      </h1>
+    );
+
   if (!connections || connections.length === 0)
     return (
       <h1 className="flex justify-center my-10 text-4xl text-gray-600 font-semibold">
