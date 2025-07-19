@@ -10,6 +10,8 @@ import Connections from "./components/Connections";
 import Requests from "./components/Requests";
 import Welcome from "./components/Welcome";
 import Chat from "./components/Chat";
+import Home from "./components/Home";
+import DailyChallenges from "./components/DailyChallenges";
 
 // import axios from "axios";
 // const token = localStorage.getItem("token");
@@ -26,7 +28,9 @@ function App() {
             <Route index element={<Welcome />} />
             <Route path="welcome" element={<Welcome />} />
             <Route path="login" element={<Login />} />
+            <Route path="home" element={<Home />} />
             <Route path="feed" element={<Feed />} />
+            <Route path="daily" element={<DailyChallenges />} />
             <Route path="profile" element={<Profile />} />
             <Route path="connections" element={<Connections />} />
             <Route path="requests" element={<Requests />} />

@@ -24,7 +24,7 @@ const NavBar = () => {
   // 🧭 Brand button: Navigates to feed or welcome based on login state
   const handleLinkClick = () => {
     if (!user) navigate("/welcome");
-    else navigate("/feed");
+    else navigate("/home");
   };
 
   return (
@@ -82,7 +82,7 @@ const NavBar = () => {
               >
                 <li>
                   <Link
-                    to="/feed"
+                    to="/home"
                     className="hover:bg-gray-700 rounded-md px-3 py-2 transition-colors duration-150"
                   >
                     Home

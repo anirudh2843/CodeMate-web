@@ -9,7 +9,7 @@ const appStore = configureStore({
     user: userReducer,
     feed: feedReducer,
     connections: connectionReducer,
-    requests: requestReducer, 
+    requests: requestReducer,
   },
 });
 

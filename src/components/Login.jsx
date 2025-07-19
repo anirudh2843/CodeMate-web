@@ -44,7 +44,7 @@ const Login = () => {
 
         // Update Redux store and navigate
         dispatch(addUser(res.data.data));
-        navigate("/feed");
+        navigate("/home");
       } else {
         setError("Login failed, try again.");
       }
