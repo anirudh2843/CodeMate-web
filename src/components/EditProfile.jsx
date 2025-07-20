@@ -16,6 +16,7 @@ const EditProfile = ({ user }) => {
   const [toast, setToast] = useState(false);
   const [skills, setSkills] = useState(user.skills || "");
   const dispatch = useDispatch();
+  const token = localStorage.getItem("token");
 
   const saveProfile = async () => {
     setError("");
@@ -31,7 +32,7 @@ const EditProfile = ({ user }) => {
           gender,
           skills,
         },
-        { withCredentials: true }
+        { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       );
       dispatch(addUser(res?.data?.data));
       setToast(true);
