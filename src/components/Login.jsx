@@ -11,6 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Toggle between Login and SignUp
   const [isLoginForm, setLoginForm] = useState(true);
@@ -21,6 +22,8 @@ const Login = () => {
 
   //  Login Handler
   const handleLogin = async () => {
+    setError(""); // Clear previous errors
+
     if (!emailId || !password) {
       setError("Both fields are required!");
       return;
@@ -28,29 +31,44 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        `${BASE_URL}`+"/login",
+        `${BASE_URL}/login`,
         { emailId, password },
         { withCredentials: true }
       );
 
-      // On successful login
-      if (res.status === 200 && res.data.token) {
-        // Store token and user data in localStorage
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.data));
+      const { token, data } = res.data;
 
-        // Set axios default header for auth
-        axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+      if (res.status === 200 && token) {
+        // Store token and user data
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(data));
 
-        // Update Redux store and navigate
-        dispatch(addUser(res.data.data));
+        // Set axios default header
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        dispatch(addUser(data));
         navigate("/home");
       } else {
-        setError("Login failed, try again.");
+        setError("Login failed, please try again.");
       }
     } catch (err) {
-      console.error("Error during login:", err);
-      setError("Login failed, please try again.");
+      console.error("Login error:", err);
+
+      if (err.response) {
+        const status = err.response.status;
+
+        if (status === 400 || status === 401) {
+          setError(
+            "Invalid credentials. Please check your email and password."
+          );
+        } else if (status === 404) {
+          setError("Account doesn't exist. Please sign up.");
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
+      } else {
+        setError("Unable to connect to the server. Please try again.");
+      }
     }
   };
 
@@ -127,12 +145,20 @@ const Login = () => {
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Password</legend>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 className="input"
                 placeholder="Enter Password"
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <label style={{ marginTop: "6px" }}>
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                />{" "}
+                Show Password
+              </label>
             </fieldset>
           </div>
 
