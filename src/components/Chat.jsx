@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
@@ -8,12 +7,12 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
+import { socket } from "../utils/socket";
 
 const Chat = () => {
   const { targetUserId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -45,38 +44,37 @@ const Chat = () => {
       console.error("Error fetching chat messages:", error);
     }
   };
-
   useEffect(() => {
-    if (targetUserId && user) {
-      fetchChatMessages();
-    }
-  }, [targetUserId, user]);
+    fetchChatMessages();
+  }, [targetUserId]);
 
   useEffect(() => {
     if (!userId || !targetUserId || !user) return;
 
-    const newSocket = createSocketConnection();
+    let hasJoined = false;
 
-    newSocket.emit("joinChat", {
+    socket.emit("joinChat", {
       firstName: user?.firstName || "Unknown",
       userId,
       targetUserId,
     });
 
-    newSocket.on("messageReceived", ({ firstName, lastName, text, createdAt, senderId }) => {
-      const newMsg = { firstName, lastName, text, createdAt, senderId };
-      setMessages((prev) => [...prev, newMsg]);
-    });
+    socket.on(
+      "messageReceived",
+      ({ firstName, lastName, text, createdAt, senderId }) => {
+        const newMsg = { firstName, lastName, text, createdAt, senderId };
+        setMessages((prev) => [...prev, newMsg]);
+      }
+    );
 
-    newSocket.on("connect_error", (error) => {
+    socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
     });
 
-    setSocket(newSocket);
-
     return () => {
-      newSocket.disconnect();
-      setSocket(null);
+      socket.off("messageReceived");
+      socket.off("connect_error");
+      socket.emit("leaveChat", { userId });
     };
   }, [userId, targetUserId, user?.firstName]);
 

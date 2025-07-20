@@ -4,12 +4,36 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
+import { io } from "socket.io-client";
+import { socket } from "../utils/socket";
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections);
+  const currentUser = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser?._id) return;
+
+    // ✅ Emit joinChat with userId only (targetUserId not needed here)
+    socket.emit("joinChat", {
+      userId: currentUser._id,
+      firstName: currentUser.firstName || "User",
+    });
+
+    // ✅ Listen for updated list of online users
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users); // Set in state
+    });
+
+    // ✅ Clean up socket listener on unmount
+    return () => {
+      socket.off("onlineUsers");
+    };
+  }, [currentUser?._id]);
 
   const fetchConnections = async () => {
     try {
@@ -85,6 +109,9 @@ const Connections = () => {
               <div className="flex-1 mt-4 sm:mt-0 sm:ml-6 min-w-0 text-center sm:text-left">
                 <h2 className="text-xl font-semibold">
                   {firstName} {lastName}
+                  {onlineUsers.includes(_id) && (
+                    <span className="inline-block ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  )}
                 </h2>
                 {age && gender && (
                   <p className="text-sm mt-1">

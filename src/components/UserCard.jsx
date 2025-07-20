@@ -1,5 +1,4 @@
 import axios from "axios";
-import React from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
@@ -23,11 +22,6 @@ const UserCard = ({ user }) => {
         }
       );
 
-      // Show confirmation message (optional)
-      if (res.data && res.data.message) {
-        alert(res.data.message); // Or use a toast library like react-toastify
-      }
-
       // Remove user from feed after successful request
       dispatch(removeUserFromFeed(userId));
     } catch (err) {
@@ -35,7 +29,6 @@ const UserCard = ({ user }) => {
         "Error sending request:",
         err?.response?.data || err.message
       );
-      alert("Failed to send request. Please try again.");
     }
   };
 

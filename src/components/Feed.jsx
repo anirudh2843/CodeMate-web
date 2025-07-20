@@ -6,12 +6,12 @@ import { addFeed } from "../utils/feedSlice";
 import UserCard from "./UserCard";
 
 const Feed = () => {
-  const feed = useSelector((store) => store.feed); // 📰 Redux feed state
+  const feed = useSelector((store) => store.feed); 
   const dispatch = useDispatch();
 
-  const [loading, setLoading] = useState(false); // 🔄 Loading indicator
-  const [error, setError] = useState(false);     // ❌ Error state
-  const [currentIndex, setCurrentIndex] = useState(0); // 👆 Index tracker
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0); 
 
   // 📦 Fetch feed data from backend
   const getFeed = async () => {

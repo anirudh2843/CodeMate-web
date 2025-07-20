@@ -12,6 +12,9 @@ import Welcome from "./components/Welcome";
 import Chat from "./components/Chat";
 import Home from "./components/Home";
 import DailyChallenges from "./components/DailyChallenges";
+import { socket } from "./utils/socket";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 // import axios from "axios";
 // const token = localStorage.getItem("token");
@@ -20,25 +23,34 @@ import DailyChallenges from "./components/DailyChallenges";
 // }
 
 function App() {
+  const user = useSelector((store) => store.user);
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.emit("joinChat", {
+        userId: user._id,
+        firstName: user.firstName,
+      });
+    }
+  }, [user?._id]);
+
   return (
-    <Provider store={appStore}>
-      <BrowserRouter basename="/">
-        <Routes>
-          <Route path="/" element={<Body />}>
-            <Route index element={<Welcome />} />
-            <Route path="welcome" element={<Welcome />} />
-            <Route path="login" element={<Login />} />
-            <Route path="home" element={<Home />} />
-            <Route path="feed" element={<Feed />} />
-            <Route path="daily" element={<DailyChallenges />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="connections" element={<Connections />} />
-            <Route path="requests" element={<Requests />} />
-            <Route path="chat/:targetUserId" element={<Chat />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </Provider>
+    <BrowserRouter basename="/">
+      <Routes>
+        <Route path="/" element={<Body />}>
+          <Route index element={<Welcome />} />
+          <Route path="welcome" element={<Welcome />} />
+          <Route path="login" element={<Login />} />
+          <Route path="home" element={<Home />} />
+          <Route path="feed" element={<Feed />} />
+          <Route path="daily" element={<DailyChallenges />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="connections" element={<Connections />} />
+          <Route path="requests" element={<Requests />} />
+          <Route path="chat/:targetUserId" element={<Chat />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
