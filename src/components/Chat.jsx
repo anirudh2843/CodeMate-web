@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
+
 
 const Chat = () => {
   const { targetUserId } = useParams();
@@ -15,14 +15,18 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const user = useSelector((store) => store.user);
   const userId = user?._id;
 
-  // Fetch initial chat messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const fetchChatMessages = async () => {
     if (!targetUserId) return;
-    
+
     try {
       const chat = await axios.get(`${BASE_URL}/chat/${targetUserId}`, {
         withCredentials: true,
@@ -35,72 +39,54 @@ const Chat = () => {
         createdAt: msg?.createdAt,
         senderId: msg?.senderId?._id,
       }));
-      
+
       setMessages(chatMessages || []);
     } catch (error) {
       console.error("Error fetching chat messages:", error);
     }
   };
 
-  // Initialize chat messages on component mount
   useEffect(() => {
     if (targetUserId && user) {
       fetchChatMessages();
     }
   }, [targetUserId, user]);
 
-  // Setup socket connection
   useEffect(() => {
-    if (!userId || !targetUserId || !user) {
-      return;
-    }
+    if (!userId || !targetUserId || !user) return;
 
     const newSocket = createSocketConnection();
 
-    // Join the chat room
     newSocket.emit("joinChat", {
       firstName: user?.firstName || "Unknown",
       userId,
       targetUserId,
     });
 
-    // Listen for incoming messages
     newSocket.on("messageReceived", ({ firstName, lastName, text, createdAt, senderId }) => {
-      const newMessage = {
-        firstName,
-        lastName,
-        text,
-        createdAt,
-        senderId,
-      };
-      
-      // Add all messages to UI (including your own from other devices/tabs)
-      setMessages((prev) => [...prev, newMessage]);
+      const newMsg = { firstName, lastName, text, createdAt, senderId };
+      setMessages((prev) => [...prev, newMsg]);
     });
 
-    // Handle connection errors
     newSocket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
     });
 
     setSocket(newSocket);
 
-    // Cleanup on unmount
     return () => {
       newSocket.disconnect();
       setSocket(null);
     };
   }, [userId, targetUserId, user?.firstName]);
 
-  // Send message function
   const sendMessage = async () => {
     if (newMessage.trim() === "" || loading || !socket || !user) return;
 
     const messageText = newMessage.trim();
     setLoading(true);
-    
+
     try {
-      // Send message to backend
       const response = await axios.post(
         `${BASE_URL}/chat/${targetUserId}`,
         { text: messageText },
@@ -113,9 +99,8 @@ const Chat = () => {
       );
 
       const savedMessage = response?.data?.messages?.slice(-1)[0];
-      
+
       if (savedMessage) {
-        // Emit message via socket (backend will broadcast to all clients)
         socket.emit("sendMessage", {
           firstName: user?.firstName || "Unknown",
           lastName: user?.lastName || "User",
@@ -136,7 +121,6 @@ const Chat = () => {
     }
   };
 
-  // Handle Enter key press
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -144,7 +128,10 @@ const Chat = () => {
     }
   };
 
-  // Show loading state if user is not loaded yet
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   if (!user) {
     return (
       <div className="w-full max-w-4xl mx-auto border-4 border-blue-900 rounded-2xl m-5 h-[70vh] flex items-center justify-center">
@@ -164,9 +151,9 @@ const Chat = () => {
       <h1 className="p-5 border-b border-gray-600 text-center text-xl font-semibold">
         Chat
       </h1>
-      
+
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-5 max-h-[60vh]">
+      <div className="flex-1 overflow-y-auto p-5 max-h-[60vh] min-h-0">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-10">
             No messages yet. Start the conversation!
@@ -177,7 +164,7 @@ const Chat = () => {
               key={`${msg.createdAt}-${index}`}
               className={
                 "chat " +
-                (user?.firstName === msg.firstName ? "chat-end" : "chat-start")
+                (user?._id === msg.senderId ? "chat-end" : "chat-start")
               }
               style={{ wordBreak: "break-word", maxWidth: "100%" }}
             >
@@ -191,6 +178,7 @@ const Chat = () => {
             </div>
           ))
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
