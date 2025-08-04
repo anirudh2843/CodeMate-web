@@ -5,7 +5,7 @@ import "./index.css";
 
 import axios from "axios";
 import { Provider } from "react-redux";
-import appStore from "./utils/appStore"; 
+import appStore from "./utils/appStore";
 
 // Set default Authorization header if token exists in localStorage
 const token = localStorage.getItem("token");
@@ -20,3 +20,11 @@ createRoot(document.getElementById("root")).render(
     </Provider>
   </StrictMode>
 );
+
+// createRoot(document.getElementById('root')).render(
+//   <Provider store={appStore}>
+//   <BrowserRouter basename='/'>
+//   <App />
+//   </BrowserRouter>
+//   </Provider>
+// )

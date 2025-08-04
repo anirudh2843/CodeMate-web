@@ -3,8 +3,7 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
-import { Link } from "react-router-dom";
-import { io } from "socket.io-client";
+import { Link, useLocation } from "react-router-dom";
 import { socket } from "../utils/socket";
 
 const Connections = () => {
@@ -15,25 +14,51 @@ const Connections = () => {
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
+  // ✅ Load unread messages from localStorage (persisted across refresh)
+  const [unreadMessages, setUnreadMessages] = useState(() => {
+    const saved = localStorage.getItem("unreadMessages");
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const location = useLocation(); // ✅ Detect current route
+
+  // ✅ Save unread messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("unreadMessages", JSON.stringify(unreadMessages));
+  }, [unreadMessages]);
+
   useEffect(() => {
     if (!currentUser?._id) return;
 
-    // ✅ Emit joinChat with userId only (targetUserId not needed here)
+    // ✅ Join socket room
     socket.emit("joinChat", {
       userId: currentUser._id,
       firstName: currentUser.firstName || "User",
     });
 
-    // ✅ Listen for updated list of online users
+    // ✅ Listen for updated online users
     socket.on("onlineUsers", (users) => {
-      setOnlineUsers(users); // Set in state
+      setOnlineUsers(users);
     });
 
-    // ✅ Clean up socket listener on unmount
+    // ✅ Listen for new incoming messages
+    socket.on("messageReceived", (msg) => {
+      const { senderId } = msg;
+
+      // If user is NOT already in the sender's chat page, increase unread count
+      if (!location.pathname.includes(`/chat/${senderId}`)) {
+        setUnreadMessages((prev) => ({
+          ...prev,
+          [senderId]: (prev[senderId] || 0) + 1,
+        }));
+      }
+    });
+
     return () => {
       socket.off("onlineUsers");
+      socket.off("messageReceived");
     };
-  }, [currentUser?._id]);
+  }, [currentUser?._id, location.pathname]);
 
   const fetchConnections = async () => {
     try {
@@ -43,6 +68,8 @@ const Connections = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      console.log("API Response:", res.data);
+      console.log("Frontend Token:", localStorage.getItem("token"));
 
       const validConnections = res?.data?.data?.filter((con) => con !== null);
       dispatch(addConnections(validConnections));
@@ -60,6 +87,16 @@ const Connections = () => {
   useEffect(() => {
     fetchConnections();
   }, []);
+
+  const handleOpenChat = (userId) => {
+    // ✅ Reset unread count for this user in state & localStorage
+    setUnreadMessages((prev) => {
+      const updated = { ...prev };
+      delete updated[userId];
+      localStorage.setItem("unreadMessages", JSON.stringify(updated)); // ✅ Update localStorage immediately
+      return updated;
+    });
+  };
 
   if (loading)
     return (
@@ -107,7 +144,7 @@ const Connections = () => {
                 className="w-28 h-28 sm:w-45 sm:h-45 rounded-4xl object-cover border-2 border-indigo-500 flex-shrink-0"
               />
               <div className="flex-1 mt-4 sm:mt-0 sm:ml-6 min-w-0 text-center sm:text-left">
-                <h2 className="text-xl font-semibold">
+                <h2 className="text-xl font-semibold flex items-center">
                   {firstName} {lastName}
                   {onlineUsers.includes(_id) && (
                     <span className="inline-block ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -122,11 +159,19 @@ const Connections = () => {
                   {about}
                 </p>
               </div>
-              <Link to={`/chat/${_id}`}>
-                <button className="mt-4 sm:mt-0 sm:ml-6 bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
-                  Chat
-                </button>
-              </Link>
+              <div className="relative">
+                <Link to={`/chat/${_id}`} onClick={() => handleOpenChat(_id)}>
+                  <button className="mt-4 sm:mt-0 sm:ml-6 bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition relative">
+                    Chat
+                  </button>
+                  {/* ✅ Unread message badge */}
+                  {unreadMessages[_id] && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {unreadMessages[_id]}
+                    </span>
+                  )}
+                </Link>
+              </div>
             </div>
           );
         })}

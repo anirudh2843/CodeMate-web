@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addRequests, removeRequests } from "../utils/requestSlice";
+import { addRequest, removeRequest } from "../utils/requestSlice";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
@@ -16,7 +16,7 @@ const Requests = () => {
         {},
         { withCredentials: true }
       );
-      dispatch(removeRequests(_id));
+      dispatch(removeRequest(_id));
     } catch (err) {}
   };
 
@@ -25,7 +25,7 @@ const Requests = () => {
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
       });
-      dispatch(addRequests(res.data.data));
+      dispatch(addRequest(res.data.data));
     } catch (err) {
       setError(true);
     }

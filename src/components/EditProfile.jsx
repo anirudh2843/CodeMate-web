@@ -19,8 +19,8 @@ const EditProfile = ({ user }) => {
   const token = localStorage.getItem("token");
 
   const saveProfile = async () => {
-    setError("");
     try {
+      setError("");
       const res = await axios.patch(
         BASE_URL + "/profile/edit",
         {

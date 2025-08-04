@@ -1,5 +1,5 @@
 {
-  "name": "devtinder-web",
+  "name": "code",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -18,8 +18,10 @@
     "nodemailer": "^7.0.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.0",
+    "react-toastify": "^11.0.5",
     "relative-time": "^1.0.0",
     "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.0.15"
