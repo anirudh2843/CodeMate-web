@@ -68,8 +68,6 @@ const Connections = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log("API Response:", res.data);
-      console.log("Frontend Token:", localStorage.getItem("token"));
 
       const validConnections = res?.data?.data?.filter((con) => con !== null);
       dispatch(addConnections(validConnections));

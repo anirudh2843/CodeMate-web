@@ -7,6 +7,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { socket } from "../utils/socket";
 
+
+
 dayjs.extend(relativeTime);
 
 const Chat = () => {
@@ -23,23 +25,6 @@ const Chat = () => {
 
   const user = useSelector((store) => store.user);
   const userId = user?._id;
-
-  // ✅ Fetch target user details
-  const fetchTargetUser = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/chat/user/${targetUserId}`, {
-        withCredentials: true,
-      });
-      setTargetUser(res.data);
-    } catch (err) {
-      if (err.response?.status === 404) {
-        console.warn("⚠️ User not found");
-        setTargetUser({ firstName: "Unknown", lastName: "" });
-      } else {
-        console.error("Failed to fetch target user info", err);
-      }
-    }
-  };
 
   // ✅ Fetch messages from backend
   const fetchChatMessages = async () => {
@@ -65,10 +50,8 @@ const Chat = () => {
       console.error("Error fetching chat messages:", error);
     }
   };
-
-  // ✅ Load target user & messages on refresh
+//  messages on refresh
   useEffect(() => {
-    fetchTargetUser();
     fetchChatMessages();
   }, [targetUserId]);
 
@@ -173,7 +156,7 @@ const Chat = () => {
     <div className="w-full max-w-6xl mx-auto border-4 border-blue-900 rounded-2xl m-5 h-[70vh] flex flex-col">
       {/* Header with Online Status */}
       <h1 className="p-5 border-b border-gray-600 text-center text-xl font-semibold flex items-center justify-center gap-3">
-        {targetUser ? `${targetUser.firstName} ${targetUser.lastName}` : "Chat"}
+        Chat
         {isTargetOnline ? (
           <span className="text-green-400 text-sm">● Online</span>
         ) : (

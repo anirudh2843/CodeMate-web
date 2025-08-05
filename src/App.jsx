@@ -16,6 +16,10 @@ import { socket } from "./utils/socket";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
+import { ToastContainer } from "react-toastify";
+import NotificationListener from "./components/NotificationListener";
+import "react-toastify/dist/ReactToastify.css";
+
 // import axios from "axios";
 // const token = localStorage.getItem("token");
 // if (token) {
@@ -25,17 +29,18 @@ import { useSelector } from "react-redux";
 function App() {
   const user = useSelector((store) => store.user);
 
-  useEffect(() => {
-    if (user?._id) {
-      socket.emit("joinChat", {
-        userId: user._id,
-        firstName: user.firstName,
-      });
-    }
-  }, [user?._id]);
+  // useEffect(() => {
+  //   if (user?._id) {
+  //     socket.emit("joinChat", {
+  //       userId: user._id,
+  //       firstName: user.firstName,
+  //     });
+  //   }
+  // }, [user?._id]);
 
   return (
     <BrowserRouter basename="/">
+      <NotificationListener />
       <Routes>
         <Route path="/" element={<Body />}>
           <Route index element={<Welcome />} />
@@ -50,6 +55,7 @@ function App() {
           <Route path="chat/:targetUserId" element={<Chat />} />
         </Route>
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   );
 }
