@@ -19,6 +19,7 @@ const Chat = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [targetUser, setTargetUser] = useState(null);
+  const [chatId, setChatId] = useState(null);
 
   const user = useSelector((store) => store.user);
   const userId = user?._id;
@@ -46,15 +47,17 @@ const Chat = () => {
       const chat = await axios.get(`${BASE_URL}/chat/${targetUserId}`, {
         withCredentials: true,
       });
+      setChatId(chat.data._id);
 
       const chatMessages = chat?.data?.messages.map((msg) => ({
+        _id: msg._id,
+        chatId: chat.data._id,
         firstName: msg?.senderId?.firstName,
         lastName: msg?.senderId?.lastName,
         text: msg?.text,
         createdAt: msg?.createdAt,
-        senderId: msg?.senderId?._id || msg?.senderId,
-        path: msg?.path || null,
-        filename: msg?.filename || null,
+        senderId: msg?.senderId?._id,
+        image: msg.image ? true : false,
       }));
 
       setMessages(chatMessages || []);
@@ -80,7 +83,19 @@ const Chat = () => {
     });
 
     socket.on("messageReceived", (msg) => {
-      setMessages((prev) => [...prev, msg]); // ✅ Add new message to state
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: msg._id,
+          chatId: msg.chatId, // ✅ Now available for images
+          firstName: msg.firstName,
+          lastName: msg.lastName,
+          text: msg.text,
+          createdAt: msg.createdAt,
+          senderId: msg.senderId,
+          image: msg.image,
+        },
+      ]);
     });
 
     socket.on("onlineUsers", (users) => {
@@ -117,12 +132,14 @@ const Chat = () => {
 
       if (savedMessage) {
         socket.emit("sendMessage", {
+          _id: savedMessage._id, // ✅ Add message ID
+          chatId: res.data._id || chatId,
           firstName: user.firstName,
           lastName: user.lastName,
           text: savedMessage.text,
           createdAt: savedMessage.createdAt,
           senderId: savedMessage.senderId._id || savedMessage.senderId,
-          path: savedMessage.path || null,
+          image: !!savedMessage.image,
         });
       }
 
@@ -188,12 +205,16 @@ const Chat = () => {
               </div>
               <div className="chat-bubble max-w-full">
                 {msg.text && <p>{msg.text}</p>}
-                {msg.path && (
+                {msg.image && (
                   <img
-                    src={`${BASE_URL}${msg.path}`}
+                    src={`${BASE_URL}/${msg.chatId}/image/${msg._id}`} // ✅ Guaranteed chatId now
                     alt="uploaded"
                     className="mt-2 max-w-xs rounded cursor-pointer hover:opacity-90"
-                    onClick={() => setPreviewImage(`${BASE_URL}${msg.path}`)}
+                    onClick={() =>
+                      setPreviewImage(
+                        `${BASE_URL}/${msg.chatId}/image/${msg._id}`
+                      )
+                    }
                   />
                 )}
               </div>
