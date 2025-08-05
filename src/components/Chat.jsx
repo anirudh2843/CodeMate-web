@@ -68,7 +68,7 @@ const Chat = () => {
 
   // ✅ Load target user & messages on refresh
   useEffect(() => {
-    // fetchTargetUser();
+    fetchTargetUser();
     fetchChatMessages();
   }, [targetUserId]);
 
